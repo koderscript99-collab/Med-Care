@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prescriptions — MediCare</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --sky-deep:    #a8d8ea;
+      --sky-mid:     #cceeff;
+      --sky-light:   #e8f7ff;
+      --sky-pale:    #f3fbff;
+      --text-dark:   #1a3a4a;
+      --text-mid:    #3a6070;
+      --text-soft:   #6899aa;
+      --accent:      #2a8fa8;
+      --accent-glow: rgba(42,143,168,0.15);
+      --card-bg:     rgba(255,255,255,0.72);
+      --card-border: rgba(168,216,234,0.55);
+      --sidebar-w:   230px;
+      --topbar-h:    62px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; color: var(--text-dark); background: var(--sky-pale); min-height: 100vh; overflow-x: hidden; }
+
+    .bg-canvas { position: fixed; inset: 0; z-index: -1; background: linear-gradient(160deg,#ddf2fb 0%,#b8e4f4 20%,#cceeff 40%,#e8f7ff 60%,#f0faff 80%,#fff 100%); background-size: 300% 300%; animation: gradShift 14s ease infinite; }
+    @keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.28; pointer-events: none; z-index: -1; animation: floatBlob 18s ease-in-out infinite; }
+    .blob-1 { width: 460px; height: 460px; background: #8fd0e8; top: -100px; left: -80px; }
+    .blob-2 { width: 300px; height: 300px; background: #b0e0f5; top: 40%; right: -60px; animation-delay: -6s; }
+    .blob-3 { width: 240px; height: 240px; background: #cceeff; bottom: 5%; left: 30%; animation-delay: -12s; }
+    @keyframes floatBlob { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(24px,-32px) scale(1.04)} 66%{transform:translate(-16px,16px) scale(0.97)} }
+
+    .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 200; height: var(--topbar-h); background: rgba(255,255,255,0.58); backdrop-filter: blur(18px); border-bottom: 1px solid var(--card-border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
+    .topbar-brand { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: var(--accent); display: flex; align-items: center; gap: 8px; letter-spacing: 0.02em; }
+    .topbar-brand span { color: var(--text-dark); }
+    .topbar-right { display: flex; align-items: center; gap: 20px; }
+    .user-chip { display: flex; align-items: center; gap: 8px; background: var(--accent-glow); border: 1px solid var(--card-border); border-radius: 50px; padding: 5px 14px 5px 5px; font-size: 0.84rem; color: var(--text-mid); }
+    .user-chip .avatar { width: 28px; height: 28px; background: linear-gradient(135deg,var(--sky-deep),var(--accent)); border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 0.72rem; color: #fff; }
+    .topbar-right a { color: var(--text-soft); text-decoration: none; font-size: 0.82rem; transition: color .2s; }
+    .topbar-right a:hover { color: var(--accent); }
+
+    .layout { display: flex; min-height: 100vh; padding-top: var(--topbar-h); }
+    .sidebar { width: var(--sidebar-w); flex-shrink: 0; background: rgba(255,255,255,0.58); backdrop-filter: blur(14px); border-right: 1px solid var(--card-border); padding: 28px 0; position: fixed; top: var(--topbar-h); left: 0; height: calc(100vh - var(--topbar-h)); overflow-y: auto; }
+    .sidebar-label { font-size: 0.67rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-soft); padding: 14px 22px 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 22px; color: var(--text-mid); text-decoration: none; font-size: 0.875rem; font-weight: 400; border-left: 2.5px solid transparent; transition: background .15s, color .15s; }
+    .nav-item i { width: 16px; text-align: center; font-size: 0.88rem; opacity: 0.8; }
+    .nav-item:hover { background: rgba(42,143,168,0.07); color: var(--accent); }
+    .nav-item.active { background: rgba(42,143,168,0.1); color: var(--accent); border-left-color: var(--accent); font-weight: 500; }
+
+    .main { flex: 1; margin-left: var(--sidebar-w); padding: 34px 36px; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.1rem; font-weight: 400; color: var(--text-dark); }
+    .page-header p { font-size: 0.875rem; color: var(--text-soft); margin-top: 4px; }
+
+    /* RX GRID */
+    .rx-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(268px,1fr)); gap: 18px; margin-bottom: 28px; }
+    .rx-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 22px 24px;
+      border-top: 3px solid var(--accent);
+      backdrop-filter: blur(12px);
+      transition: transform .25s, box-shadow .25s;
+      position: relative; overflow: hidden;
+    }
+    .rx-card::after { content: ''; position: absolute; bottom: -24px; right: -24px; width: 90px; height: 90px; background: rgba(168,216,234,0.2); border-radius: 50%; }
+    .rx-card:hover { transform: translateY(-3px); box-shadow: 0 16px 50px rgba(42,143,168,0.16); }
+    .rx-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .rx-icon-lg { width: 48px; height: 48px; background: linear-gradient(135deg,var(--sky-deep),var(--sky-mid)); border-radius: 13px; display: grid; place-items: center; color: var(--accent); font-size: 1.2rem; }
+    .rx-number { font-size: 0.69rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-soft); background: rgba(168,216,234,0.2); border: 1px solid var(--card-border); padding: 3px 10px; border-radius: 50px; }
+    .rx-drug-name { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+    .rx-dosage { font-size: 0.82rem; color: var(--text-soft); }
+    .rx-meta { margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(168,216,234,0.6); display: flex; gap: 8px; flex-wrap: wrap; }
+    .rx-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 500; padding: 3px 10px; border-radius: 50px; }
+    .rx-tag.active { background: rgba(168,216,234,0.35); color: #1a7a9a; }
+    .rx-tag.info { background: rgba(168,216,234,0.2); color: var(--text-mid); }
+
+    /* TABLE */
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; backdrop-filter: blur(12px); overflow: hidden; }
+    .card-header { padding: 16px 22px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; }
+    .card-header h3 { font-size: 0.88rem; font-weight: 500; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+    .card-header h3 i { color: var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th { text-align: left; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-soft); padding: 12px 20px; background: rgba(168,216,234,0.1); border-bottom: 1px solid var(--card-border); }
+    tbody td { padding: 13px 20px; font-size: 0.875rem; border-bottom: 1px solid rgba(168,216,234,0.3); color: var(--text-dark); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(168,216,234,0.08); }
+    .td-drug { font-weight: 500; display: flex; align-items: center; gap: 8px; }
+    .td-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+    .status-pill { font-size: 0.7rem; font-weight: 500; padding: 3px 10px; border-radius: 50px; background: rgba(168,216,234,0.4); color: #1a7a9a; }
+  </style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="topbar">
+  <div class="topbar-brand">✦ <span>Medi</span>Care</div>
+  <div class="topbar-right">
+    <div class="user-chip">
+      <div class="avatar">JD</div>
+      John Doe &nbsp;<span style="opacity:.4">|</span>&nbsp; PAT-4a7b2c1d
+    </div>
+    <a href="#"><i class="fa-solid fa-bell"></i></a>
+    <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-label">Menu</div>
+    <a class="nav-item" href="/dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    <a class="nav-item" href="/ward"><i class="fa-solid fa-bed-pulse"></i> Ward Info</a>
+    <a class="nav-item" href="/medlab"><i class="fa-solid fa-flask-vial"></i> Med Lab</a>
+    <a class="nav-item active" href="/prescriptions"><i class="fa-solid fa-pills"></i> Prescriptions</a>
+    <a class="nav-item" href="/messages"><i class="fa-solid fa-comment-medical"></i> Messages</a>
+    <div class="sidebar-label" style="margin-top:14px">Account</div>
+    <a class="nav-item" href="/profile"><i class="fa-solid fa-user"></i> My Profile</a>
+    <a class="nav-item" href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <h1>Prescriptions</h1>
+      <p>All medications currently prescribed to you by your attending physician.</p>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-card">
+        <div class="rx-card-top">
+          <div class="rx-icon-lg"><i class="fa-solid fa-capsules"></i></div>
+          <span class="rx-number">Rx #001</span>
+        </div>
+        <div class="rx-drug-name">Amoxicillin</div>
+        <div class="rx-dosage">500mg capsule</div>
+        <div class="rx-meta">
+          <span class="rx-tag active"><i class="fa-solid fa-circle" style="font-size:.45rem"></i> Active</span>
+          <span class="rx-tag info"><i class="fa-solid fa-clock"></i> Twice daily</span>
+        </div>
+      </div>
+
+      <div class="rx-card">
+        <div class="rx-card-top">
+          <div class="rx-icon-lg"><i class="fa-solid fa-tablets"></i></div>
+          <span class="rx-number">Rx #002</span>
+        </div>
+        <div class="rx-drug-name">Metformin</div>
+        <div class="rx-dosage">850mg tablet</div>
+        <div class="rx-meta">
+          <span class="rx-tag active"><i class="fa-solid fa-circle" style="font-size:.45rem"></i> Active</span>
+          <span class="rx-tag info"><i class="fa-solid fa-clock"></i> Once daily</span>
+        </div>
+      </div>
+
+      <div class="rx-card">
+        <div class="rx-card-top">
+          <div class="rx-icon-lg"><i class="fa-solid fa-syringe"></i></div>
+          <span class="rx-number">Rx #003</span>
+        </div>
+        <div class="rx-drug-name">Vitamin B12</div>
+        <div class="rx-dosage">1000mcg injection</div>
+        <div class="rx-meta">
+          <span class="rx-tag active"><i class="fa-solid fa-circle" style="font-size:.45rem"></i> Active</span>
+          <span class="rx-tag info"><i class="fa-solid fa-clock"></i> Weekly</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="fa-solid fa-list"></i> Full Prescription List</h3>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Drug Name</th>
+            <th>Dosage</th>
+            <th>Frequency</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--text-soft);font-size:.78rem">Rx #001</td>
+            <td><div class="td-drug"><span class="td-dot"></span>Amoxicillin</div></td>
+            <td>500mg</td>
+            <td>Twice daily</td>
+            <td><span class="status-pill">Active</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-soft);font-size:.78rem">Rx #002</td>
+            <td><div class="td-drug"><span class="td-dot"></span>Metformin</div></td>
+            <td>850mg</td>
+            <td>Once daily</td>
+            <td><span class="status-pill">Active</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--text-soft);font-size:.78rem">Rx #003</td>
+            <td><div class="td-drug"><span class="td-dot"></span>Vitamin B12</div></td>
+            <td>1000mcg</td>
+            <td>Weekly</td>
+            <td><span class="status-pill">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body>
+</html>
