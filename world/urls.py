@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from django.urls import path
 from . import views
 
@@ -34,7 +34,7 @@ urlpatterns = [
 
 
 
-=======
+
 from django.urls import path
 from . import views
 
@@ -67,7 +67,3 @@ urlpatterns = [
 
 
 
-
-
-
->>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2

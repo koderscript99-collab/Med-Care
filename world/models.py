@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import uuid
 from django.db import models
 
@@ -123,9 +123,12 @@ class Dashboard(models.Model):
     last_login = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-=======
-import uuid
+        return f"{self.patient} — {self.last_login}"
+
+
+
 from django.db import models
+import uuid
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -248,5 +251,5 @@ class Dashboard(models.Model):
     last_login = models.DateTimeField(auto_now=True)
 
     def __str__(self):
->>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
+
         return f"{self.patient} — {self.last_login}"

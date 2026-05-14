@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from django import forms
 from .models import (
     Patience_Details,
@@ -33,18 +32,10 @@ class MedLabAdminForm(forms.ModelForm):
         model = MedLab
         fields = '__all__'
 
-
 class WardAdminForm(forms.ModelForm):
     class Meta:
         model = Ward
-=======
-from django import forms
-from .models import (
-    Patience_Details,
-    Prescriptions,
-    MedLab,
-    Ward,
-)
+        exclude = ['is_visible_to_user']
 
 
 class Patience_DetailsForm(forms.ModelForm):
@@ -76,5 +67,4 @@ class MedLabAdminForm(forms.ModelForm):
 class WardAdminForm(forms.ModelForm):
     class Meta:
         model = Ward
->>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
         fields = '__all__'

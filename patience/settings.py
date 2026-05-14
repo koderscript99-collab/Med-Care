@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 """
 Django settings for patience project.
 
@@ -130,7 +130,7 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'koderscript99@gmail.com'
 EMAIL_HOST_PASSWORD = 'hdsi tgll kmfm csuh'
-=======
+
 """
 Django settings for patience project.
 
@@ -262,5 +262,5 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'koderscript99@gmail.com'
 EMAIL_HOST_PASSWORD = 'hdsi tgll kmfm csuh'
->>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
+
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
