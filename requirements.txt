@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 asgiref==3.11.1
 Django==6.0.5
 gunicorn==26.0.0
@@ -8,3 +9,15 @@ python-decouple==3.8
 sqlparse==0.5.5
 tzdata==2026.2
 whitenoise==6.12.0
+=======
+asgiref==3.11.1
+Django==6.0.5
+gunicorn==26.0.0
+packaging==26.2
+pillow==12.2.0
+psycopg2-binary==2.9.12
+python-decouple==3.8
+sqlparse==0.5.5
+tzdata==2026.2
+whitenoise==6.12.0
+>>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2

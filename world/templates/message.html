@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <form method="POST">
     {% csrf_token %}
 
@@ -12,4 +13,20 @@
     <textarea name="message" placeholder="Write message"></textarea>
 
     <button type="submit">Send</button>
+=======
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="text" name="subject" placeholder="Subject">
+
+    <select name="category">
+        <option value="General">General</option>
+        <option value="Emergency">Emergency</option>
+        <option value="Lab">Lab</option>
+    </select>
+
+    <textarea name="message" placeholder="Write message"></textarea>
+
+    <button type="submit">Send</button>
+>>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
 </form>

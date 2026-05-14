@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- templates/lab.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -156,4 +157,164 @@
     </form>
 </div>
 </body>
+=======
+<!-- templates/lab.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Test Request</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            margin-bottom: 32px;
+        }
+
+        .card-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2d3748;
+            background: #f7fafc;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: #3182ce;
+            background: white;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover { background: #2c5282; }
+
+        .notice {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #2b6cb0;
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-header">
+        <h1>🧪 Lab Test Request</h1>
+        <p>Submit your laboratory test request below.</p>
+    </div>
+
+    <div class="notice">
+        Results will be made available once reviewed by our medical team.
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_PAT_name">Patient Name</label>
+            <input type="text" name="PAT_name" id="id_PAT_name"
+                   value="{{ form.PAT_name.value|default:'' }}"
+                   placeholder="Enter full name" required>
+            {% if form.PAT_name.errors %}
+                <small style="color:red;">{{ form.PAT_name.errors.0 }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_PAT_ID">Patient ID</label>
+            <input type="text" name="PAT_ID" id="id_PAT_ID"
+                   value="{{ form.PAT_ID.value|default:'' }}"
+                   placeholder="e.g. PAT-00123" required>
+            {% if form.PAT_ID.errors %}
+                <small style="color:red;">{{ form.PAT_ID.errors.0 }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_lab_service">Lab Service</label>
+            <select name="lab_service" id="id_lab_service" required>
+                <option value="">-- Select a service --</option>
+                {% for value, label in form.fields.lab_service.choices %}
+                    <option value="{{ value }}"
+                        {% if form.lab_service.value == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if form.lab_service.errors %}
+                <small style="color:red;">{{ form.lab_service.errors.0 }}</small>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Request</button>
+    </form>
+</div>
+</body>
+>>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
 </html>

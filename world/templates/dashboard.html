@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -453,4 +454,461 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCare — Patient Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --sky-deep:#a8d8ea;--sky-mid:#cceeff;--sky-pale:#f3fbff;
+      --text-dark:#1a3a4a;--text-mid:#3a6070;--text-soft:#6899aa;
+      --accent:#2a8fa8;--accent-light:rgba(42,143,168,.08);--accent-glow:rgba(42,143,168,.18);
+      --card-bg:rgba(255,255,255,.72);--card-border:rgba(168,216,234,.55);
+      --danger:#e07070;--success:#5bab8a;--warn:#d4956a;
+      --sidebar-w:260px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Outfit',sans-serif;color:var(--text-dark);background:var(--sky-pale);overflow-x:hidden;min-height:100vh;}
+
+    .bg-canvas{position:fixed;inset:0;z-index:-1;background:linear-gradient(160deg,#ddf2fb 0%,#b8e4f4 20%,#cceeff 40%,#e8f7ff 60%,#f0faff 80%,#fff 100%);background-size:300% 300%;animation:gradientShift 14s ease infinite;}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.28;pointer-events:none;z-index:-1;animation:floatBlob 18s ease-in-out infinite;}
+    .blob-1{width:500px;height:500px;background:#8fd0e8;top:-100px;left:-80px;}
+    .blob-2{width:340px;height:340px;background:#b0e0f5;top:45%;right:-60px;animation-delay:-7s;}
+    .blob-3{width:280px;height:280px;background:#cceeff;bottom:0;left:35%;animation-delay:-13s;}
+    @keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(28px,-36px) scale(1.04)}66%{transform:translate(-18px,18px) scale(.97)}}
+
+    .layout{display:flex;min-height:100vh;}
+
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar-w);position:fixed;top:0;left:0;bottom:0;background:rgba(255,255,255,.62);backdrop-filter:blur(22px);border-right:1px solid var(--card-border);display:flex;flex-direction:column;padding:28px 0 24px;z-index:50;transition:transform .3s;}
+    .sidebar-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--accent);padding:0 28px 28px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:8px;}
+    .sidebar-logo span{color:var(--text-dark);}
+    .sidebar-section-label{font-size:.68rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--text-soft);padding:22px 28px 8px;}
+    .sidebar-nav{flex:1;padding:8px 0;overflow-y:auto;}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 28px;font-size:.88rem;font-weight:400;color:var(--text-mid);border-left:3px solid transparent;transition:background .2s,color .2s,border-color .2s;text-decoration:none;}
+    .nav-item:hover{background:var(--accent-light);color:var(--accent);}
+    .nav-item.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);font-weight:500;}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;}
+    .sidebar-footer{padding:16px 28px 0;border-top:1px solid var(--card-border);}
+    .logout-btn{display:flex;align-items:center;gap:10px;font-size:.84rem;color:var(--danger);cursor:pointer;padding:10px 0;background:none;border:none;font-family:'Outfit',sans-serif;transition:opacity .2s;text-decoration:none;}
+    .logout-btn:hover{opacity:.7;}
+
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);flex:1;padding:32px 36px 60px;min-width:0;}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px;flex-wrap:wrap;gap:16px;}
+    .topbar-left h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;color:var(--text-dark);line-height:1.1;}
+    .topbar-left h1 em{font-style:italic;color:var(--accent);}
+    .topbar-left p{font-size:.85rem;color:var(--text-soft);margin-top:4px;}
+    .topbar-right{display:flex;align-items:center;gap:14px;}
+    .avatar{width:40px;height:40px;background:linear-gradient(135deg,var(--sky-deep),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:.9rem;}
+
+    /* SECTION HEADING */
+    .section-heading{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:400;color:var(--text-dark);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+    .section-heading::after{content:'';flex:1;height:1px;background:var(--card-border);margin-left:8px;}
+
+    /* STAT CARDS */
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin-bottom:36px;}
+    .stat-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:18px;padding:22px 24px;backdrop-filter:blur(12px);transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden;}
+    .stat-card::before{content:'';position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,var(--sky-mid) 0%,transparent 70%);opacity:.6;}
+    .stat-card:hover{transform:translateY(-4px);box-shadow:0 16px 50px rgba(42,143,168,.13);}
+    .stat-card-label{font-size:.75rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);margin-bottom:10px;}
+    .stat-card-value{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--text-dark);line-height:1;}
+    .stat-card-sub{font-size:.77rem;color:var(--text-soft);margin-top:5px;}
+    .stat-card-icon{font-size:1.4rem;margin-bottom:10px;}
+
+    /* CARD */
+    .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;backdrop-filter:blur(14px);overflow:hidden;}
+    .card-header{padding:20px 26px 16px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--text-dark);display:flex;align-items:center;gap:8px;}
+    .card-action{font-size:.78rem;color:var(--accent);cursor:pointer;font-weight:500;border:none;background:none;font-family:'Outfit',sans-serif;letter-spacing:.04em;text-decoration:none;}
+    .card-action:hover{text-decoration:underline;}
+    .card-body{padding:20px 26px;}
+
+    /* LAST LOGIN BAR */
+    .last-login-bar{background:linear-gradient(135deg,var(--accent) 0%,#1a7a9a 100%);border-radius:16px;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;color:white;margin-bottom:36px;box-shadow:0 10px 40px rgba(42,143,168,.22);flex-wrap:wrap;gap:10px;}
+    .last-login-bar p{font-size:.84rem;opacity:.85;}
+    .last-login-bar strong{font-weight:600;font-size:.9rem;}
+
+    /* PROFILE */
+    .profile-grid{display:grid;grid-template-columns:1fr 2fr;gap:24px;margin-bottom:36px;}
+    .profile-card-inner{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 24px;}
+    .profile-avatar{width:80px;height:80px;background:linear-gradient(135deg,var(--sky-deep),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:14px;box-shadow:0 8px 30px rgba(42,143,168,.25);}
+    .profile-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--text-dark);}
+    .profile-id{font-size:.78rem;color:var(--accent);letter-spacing:.12em;font-weight:500;margin-top:4px;}
+    .profile-badge{margin-top:14px;padding:5px 14px;background:rgba(91,171,138,.12);border:1px solid rgba(91,171,138,.3);border-radius:50px;font-size:.73rem;font-weight:500;color:var(--success);letter-spacing:.06em;}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .info-field label{font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);display:block;margin-bottom:3px;}
+    .info-field p{font-size:.9rem;color:var(--text-dark);font-weight:400;}
+
+    /* PRESCRIPTIONS */
+    .rx-item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid rgba(168,216,234,.2);}
+    .rx-item:last-child{border-bottom:none;}
+    .rx-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+    .rx-name{font-size:.88rem;font-weight:500;color:var(--text-dark);}
+    .rx-dosage{font-size:.78rem;color:var(--text-soft);margin-top:2px;}
+
+    /* LAB TABLE */
+    table{width:100%;border-collapse:collapse;font-size:.85rem;}
+    thead th{font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-soft);padding:10px 14px;text-align:left;border-bottom:1px solid var(--card-border);}
+    tbody tr{border-bottom:1px solid rgba(168,216,234,.2);transition:background .15s;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:rgba(168,216,234,.1);}
+    tbody td{padding:12px 14px;color:var(--text-mid);vertical-align:middle;}
+    tbody td:first-child{color:var(--text-dark);font-weight:500;}
+
+    /* BADGES */
+    .badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.72rem;font-weight:500;letter-spacing:.04em;}
+    .badge-ready{background:rgba(91,171,138,.12);color:var(--success);border:1px solid rgba(91,171,138,.3);}
+    .badge-pending{background:rgba(212,149,106,.1);color:var(--warn);border:1px solid rgba(212,149,106,.3);}
+    .badge-general{background:rgba(42,143,168,.1);color:var(--accent);border:1px solid rgba(42,143,168,.25);}
+    .badge-icu{background:rgba(224,112,112,.1);color:var(--danger);border:1px solid rgba(224,112,112,.25);}
+    .badge-maternity{background:rgba(212,149,106,.1);color:var(--warn);border:1px solid rgba(212,149,106,.3);}
+    .badge-pediatric{background:rgba(91,171,138,.12);color:var(--success);border:1px solid rgba(91,171,138,.3);}
+
+    /* VIEW IMAGE BUTTON */
+    .view-result-btn{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;color:var(--accent);background:var(--accent-light);padding:4px 10px;border-radius:50px;border:1px solid rgba(42,143,168,.2);cursor:pointer;font-family:'Outfit',sans-serif;transition:background .2s;}
+    .view-result-btn:hover{background:rgba(42,143,168,.15);}
+
+    /* IMAGE LIGHTBOX */
+    .lightbox{display:none;position:fixed;inset:0;background:rgba(26,58,74,.85);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;}
+    .lightbox.open{display:flex;}
+    .lightbox-inner{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:28px;max-width:680px;width:90%;backdrop-filter:blur(18px);position:relative;}
+    .lightbox-close{position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-soft);}
+    .lightbox-close:hover{color:var(--text-dark);}
+    .lightbox-label{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--text-dark);margin-bottom:16px;}
+    .lightbox-img{width:100%;border-radius:12px;max-height:500px;object-fit:contain;}
+
+    /* WARD */
+    .ward-card-inner{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;padding:20px 26px;}
+    .ward-field label{font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-soft);display:block;margin-bottom:3px;}
+    .ward-field p{font-size:.88rem;color:var(--text-dark);font-weight:500;}
+    .ward-report{padding:0 26px 22px;}
+    .ward-report-label{font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-soft);display:block;margin-bottom:6px;}
+    .ward-report-text{font-size:.87rem;color:var(--text-mid);line-height:1.65;background:var(--accent-light);padding:14px 16px;border-radius:12px;border:1px solid rgba(42,143,168,.15);}
+    .ward-admin-note{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--text-soft);padding:0 26px 18px;}
+
+    /* LAYOUT HELPERS */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;}
+    .full-col{margin-bottom:28px;}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:36px 20px;color:var(--text-soft);font-size:.85rem;}
+    .empty-state-icon{font-size:2rem;margin-bottom:10px;opacity:.4;}
+
+    /* BUTTON */
+    .btn-accent{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;background:var(--accent);color:white;border:none;border-radius:50px;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:500;letter-spacing:.06em;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 22px rgba(42,143,168,.28);text-decoration:none;}
+    .btn-accent:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(42,143,168,.38);}
+
+    /* ANIMATIONS */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeUp .55s ease both;}
+    .delay-1{animation-delay:.1s;}.delay-2{animation-delay:.2s;}.delay-3{animation-delay:.3s;}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-100%);}
+      .sidebar.open{transform:translateX(0);}
+      .main{margin-left:0;padding:22px 18px 60px;}
+      .profile-grid,.two-col,.info-grid{grid-template-columns:1fr;}
+    }
+    .hamburger{display:none;position:fixed;top:18px;left:18px;z-index:200;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:8px 10px;cursor:pointer;backdrop-filter:blur(10px);font-size:1.1rem;}
+    @media(max-width:900px){.hamburger{display:flex;}}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--sky-deep);border-radius:4px;}
+  </style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+<button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- LAB RESULT LIGHTBOX -->
+<div class="lightbox" id="labLightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <p class="lightbox-label" id="lightboxLabel">Lab Result</p>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="Lab Result" />
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">✦ <span>Medi</span>Care</div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a class="nav-item active" href="#overview"><span class="nav-icon">⊞</span> Dashboard</a>
+      <a class="nav-item" href="#profile"><span class="nav-icon">👤</span> My Profile</a>
+      <p class="sidebar-section-label">Health</p>
+      <a class="nav-item" href="#prescriptions"><span class="nav-icon">💊</span> Prescriptions</a>
+      <a class="nav-item" href="#medlab"><span class="nav-icon">🔬</span> Lab Results</a>
+      <a class="nav-item" href="#ward"><span class="nav-icon">🏥</span> Ward Info</a>
+    </nav>
+    <div class="sidebar-footer">
+      <p style="font-size:.78rem;color:var(--text-soft);margin-bottom:4px;">Logged in as</p>
+      <p style="font-size:.85rem;font-weight:500;color:var(--text-dark);margin-bottom:14px;">{{ patient.first_name }} {{ patient.last_name }}</p>
+      <a href="{% url 'logout' %}" class="logout-btn">↩ Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar fade-in" id="overview">
+      <div class="topbar-left">
+        <h1>Good day, <em>{{ patient.first_name }}</em> 👋</h1>
+        <p>Here's your health summary — updated when your care team makes changes.</p>
+      </div>
+      <div class="topbar-right">
+        <div class="avatar">{{ patient.first_name|first|upper }}{{ patient.last_name|first|upper }}</div>
+      </div>
+    </div>
+
+    <!-- LAST LOGIN BAR -->
+    <div class="last-login-bar fade-in delay-1">
+      <div><p>Patient ID</p><strong>{{ patient.user_id }}</strong></div>
+      <div>
+        <p>Last Login</p>
+        <strong>{% if dashboard %}{{ dashboard.last_login|date:"N j, Y — g:i A" }}{% else %}—{% endif %}</strong>
+      </div>
+      <div><p>Account Status</p><strong>✓ Active</strong></div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stats-row fade-in delay-2">
+      <div class="stat-card">
+        <div class="stat-card-icon">💊</div>
+        <div class="stat-card-label">Prescriptions</div>
+        <div class="stat-card-value">{{ prescriptions|length }}</div>
+        <div class="stat-card-sub">Active medications</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🔬</div>
+        <div class="stat-card-label">Lab Tests</div>
+        <div class="stat-card-value">{{ lab_records|length }}</div>
+        <div class="stat-card-sub">Results available</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🏥</div>
+        <div class="stat-card-label">Ward</div>
+        {% if ward_records %}
+          <div class="stat-card-value" style="font-size:1.1rem;padding-top:6px;">Admitted</div>
+          <div class="stat-card-sub">{{ ward_records.0.get_ward_category_display }}</div>
+        {% else %}
+          <div class="stat-card-value" style="font-size:1.1rem;padding-top:6px;">—</div>
+          <div class="stat-card-sub">No ward assigned</div>
+        {% endif %}
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">🪪</div>
+        <div class="stat-card-label">Patient ID</div>
+        <div class="stat-card-value" style="font-size:1rem;padding-top:6px;">{{ patient.user_id }}</div>
+        <div class="stat-card-sub">Your unique identifier</div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE ── -->
+    <h2 class="section-heading fade-in delay-2" id="profile">👤 Patient Profile</h2>
+    <div class="profile-grid fade-in delay-3">
+      <div class="card">
+        <div class="profile-card-inner">
+          <div class="profile-avatar">{{ patient.first_name|first|upper }}{{ patient.last_name|first|upper }}</div>
+          <p class="profile-name">{{ patient.first_name }} {{ patient.last_name }}</p>
+          <p class="profile-id">{{ patient.user_id }}</p>
+          <span class="profile-badge">✓ Registered Patient</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📋 Personal Information</span></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-field"><label>Email</label><p>{{ patient.email }}</p></div>
+            <div class="info-field"><label>Phone</label><p>{{ patient.phone_number }}</p></div>
+            <div class="info-field"><label>Age</label><p>{{ patient.age }}</p></div>
+            <div class="info-field"><label>Date of Birth</label><p>{{ patient.date_of_birth|date:"j M Y" }}</p></div>
+            <div class="info-field" style="grid-column:1/-1"><label>Home Address</label><p>{{ patient.home_address }}</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRESCRIPTIONS + LAB ── -->
+    <div class="two-col fade-in">
+
+      <!-- PRESCRIPTIONS -->
+      <div id="prescriptions">
+        <h2 class="section-heading">💊 Prescriptions</h2>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Active Medications</span>
+          </div>
+          <div class="card-body" style="padding:8px 26px;">
+            {% for rx in prescriptions %}
+              <div class="rx-item">
+                <div class="rx-dot"></div>
+                <div>
+                  <p class="rx-name">{{ rx.drug_name }}</p>
+                  <p class="rx-dosage">{{ rx.dosage }}</p>
+                </div>
+              </div>
+            {% empty %}
+              <div class="empty-state">
+                <div class="empty-state-icon">💊</div>
+                <p>No prescriptions on file yet.<br>Your doctor will add them here.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- LAB RESULTS -->
+      <div id="medlab">
+        <h2 class="section-heading">🔬 Lab Results</h2>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Test Records</span>
+            <a href="{% url 'medlab' %}" class="card-action">+ Request Test</a>
+          </div>
+          <div class="card-body" style="padding:0 10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Test</th>
+                  <th>Date</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for lab in lab_records %}
+                  <tr>
+                    <td>{{ lab.get_lab_service_display }}</td>
+                    <td>{% if lab.report_date %}{{ lab.report_date|date:"N j, Y" }}{% else %}—{% endif %}</td>
+                    <td>
+                      {% if lab.has_result %}
+                        <button
+                          class="view-result-btn"
+                          onclick="openLightbox('{{ lab.test_results.url }}', '{{ lab.get_lab_service_display }}')"
+                        >🖼 View Result</button>
+                      {% else %}
+                        <span class="badge badge-pending">Pending</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="3">
+                      <div class="empty-state">
+                        <div class="empty-state-icon">🔬</div>
+                        <p>No lab records visible yet.</p>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── WARD ── -->
+    <h2 class="section-heading fade-in" id="ward">🏥 Ward Information</h2>
+
+    {% for ward in ward_records %}
+      <div class="full-col fade-in">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🏥 {{ ward.get_ward_category_display }} Ward — {{ ward.ward_number }}</span>
+            <span class="badge badge-{{ ward.ward_category|lower }}">{{ ward.get_ward_category_display }}</span>
+          </div>
+          <div class="ward-card-inner">
+            <div class="ward-field"><label>Ward Number</label><p>{{ ward.ward_number }}</p></div>
+            <div class="ward-field"><label>Bed Number</label><p>{{ ward.bed_number }}</p></div>
+            <div class="ward-field"><label>Category</label><p>{{ ward.get_ward_category_display }}</p></div>
+            <div class="ward-field"><label>Guardian</label><p>{{ ward.guardians_name|default:"—" }}</p></div>
+            <div class="ward-field"><label>Contact</label><p>{{ ward.contact_number|default:"—" }}</p></div>
+          </div>
+          {% if ward.report %}
+            <div class="ward-report">
+              <span class="ward-report-label">Medical Report</span>
+              <p class="ward-report-text">{{ ward.report }}</p>
+            </div>
+          {% endif %}
+          <div class="ward-admin-note">
+            🔒 This section is managed by hospital administration. Contact the front desk for changes.
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="full-col fade-in">
+        <div class="card">
+          <div class="empty-state">
+            <div class="empty-state-icon">🏥</div>
+            <p>No ward assignment on record yet.<br>This will appear here once the admin assigns you to a ward.</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+  </main>
+</div>
+
+<script>
+  // Sidebar nav active state
+  document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', function () {
+      document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelector('.sidebar').classList.remove('open');
+    });
+  });
+
+  // Scroll-triggered fade-in
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity .55s ease, transform .55s ease';
+    io.observe(el);
+  });
+
+  // Lab result lightbox
+  function openLightbox(url, label) {
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('lightboxLabel').textContent = label + ' — Result';
+    document.getElementById('labLightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('labLightbox').classList.remove('open');
+    document.getElementById('lightboxImg').src = '';
+    document.body.style.overflow = '';
+  }
+  // Close on backdrop click
+  document.getElementById('labLightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+  // Close on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+</body>
+>>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
 </html>

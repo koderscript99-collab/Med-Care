@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- templates/medlab_records.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -201,4 +202,209 @@
 
 </div>
 </body>
+=======
+<!-- templates/medlab_records.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Lab Results</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        /* ── Filters ── */
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filters select {
+            padding: 8px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            color: #2d3748;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .filters select:focus { border-color: #3182ce; }
+
+        .btn-filter {
+            padding: 8px 18px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ── Cards ── */
+        .record-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .record-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .record-info p {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        /* ── Status badges ── */
+        .badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge-pending {
+            background: #fefcbf;
+            color: #b7791f;
+        }
+
+        .badge-ready {
+            background: #c6f6d5;
+            color: #276749;
+        }
+
+        .btn-download {
+            padding: 8px 16px;
+            background: #276749;
+            color: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-download:hover { background: #22543d; }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty span { font-size: 48px; display: block; margin-bottom: 12px; }
+
+        .btn-new {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: #2b6cb0;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🧪 My Lab Results</h1>
+    <p class="subtitle">Track the status of your submitted lab tests.</p>
+
+    <!-- Filters -->
+    <form method="GET">
+        <div class="filters">
+            <select name="service">
+                <option value="">All Services</option>
+                {% for value, label in services %}
+                    <option value="{{ value }}"
+                        {% if selected_service == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select name="status">
+                <option value="">All Statuses</option>
+                <option value="ready"   {% if selected_status == 'ready'   %}selected{% endif %}>Ready</option>
+                <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+            </select>
+
+            <button type="submit" class="btn-filter">Filter</button>
+        </div>
+    </form>
+
+    <!-- Records -->
+    {% if data %}
+        {% for item in data %}
+        <div class="record-card">
+            <div class="record-info">
+                <h3>{{ item.lab_service }}</h3>
+                <p>{{ item.PAT_name }} &nbsp;·&nbsp; ID: {{ item.PAT_ID }}</p>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px;">
+                {% if item.result_url %}
+                    <span class="badge badge-ready">Ready ✓</span>
+                    <a href="{{ item.result_url }}" class="btn-download" target="_blank">
+                        Download
+                    </a>
+                {% else %}
+                    <span class="badge badge-pending">Pending...</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="empty">
+            <span>🔬</span>
+            <p>No lab records found.</p>
+            <a href="{% url 'medlab_submit' %}" class="btn-new">+ Submit a Request</a>
+        </div>
+    {% endif %}
+
+</div>
+</body>
+>>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
 </html>

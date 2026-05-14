@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -522,4 +523,530 @@
   });
 </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCare — Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --sky-deep:#a8d8ea; --sky-mid:#cceeff; --sky-pale:#f3fbff;
+      --text-dark:#1a3a4a; --text-mid:#3a6070; --text-soft:#6899aa;
+      --accent:#2a8fa8; --accent-light:rgba(42,143,168,0.08); --accent-glow:rgba(42,143,168,0.18);
+      --card-bg:rgba(255,255,255,0.72); --card-border:rgba(168,216,234,0.55);
+      --danger:#e07070; --success:#5bab8a; --warn:#d4956a;
+      --sidebar-w:240px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Outfit',sans-serif;color:var(--text-dark);background:var(--sky-pale);min-height:100vh;overflow-x:hidden}
+
+    .bg-canvas{position:fixed;inset:0;z-index:-1;background:linear-gradient(160deg,#ddf2fb 0%,#b8e4f4 20%,#cceeff 40%,#e8f7ff 60%,#f0faff 80%,#fff 100%);background-size:300% 300%;animation:gradientShift 14s ease infinite}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.22;pointer-events:none;z-index:-1;animation:floatBlob 18s ease-in-out infinite}
+    .blob-1{width:500px;height:500px;background:#8fd0e8;top:-100px;left:-80px}
+    .blob-2{width:340px;height:340px;background:#b0e0f5;top:45%;right:-60px;animation-delay:-7s}
+    @keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(28px,-36px) scale(1.04)}66%{transform:translate(-18px,18px) scale(.97)}}
+
+    .layout{display:flex;min-height:100vh}
+
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar-w);position:fixed;top:0;left:0;bottom:0;background:rgba(255,255,255,.68);backdrop-filter:blur(22px);border-right:1px solid var(--card-border);display:flex;flex-direction:column;padding:24px 0 20px;z-index:50;transition:transform .3s}
+    .sidebar-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:var(--accent);padding:0 22px 24px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:8px}
+    .sidebar-logo span{color:var(--text-dark)}
+    .admin-badge{display:inline-block;margin-left:6px;padding:2px 8px;background:rgba(224,112,112,.12);border:1px solid rgba(224,112,112,.3);border-radius:50px;font-size:.6rem;font-weight:600;letter-spacing:.1em;color:var(--danger);text-transform:uppercase;font-family:'Outfit',sans-serif}
+    .sidebar-section-label{font-size:.62rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--text-soft);padding:18px 22px 6px}
+    .sidebar-nav{flex:1;padding:6px 0}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 22px;font-size:.85rem;font-weight:400;color:var(--text-mid);border-left:3px solid transparent;transition:background .2s,color .2s,border-color .2s;text-decoration:none;cursor:pointer}
+    .nav-item:hover{background:var(--accent-light);color:var(--accent)}
+    .nav-item.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);font-weight:500}
+    .nav-icon{font-size:.95rem;width:18px;text-align:center}
+    .nav-count{margin-left:auto;background:var(--accent);color:white;border-radius:50px;font-size:.65rem;font-weight:600;padding:2px 7px}
+    .nav-count.danger{background:var(--danger)}
+    .sidebar-footer{padding:14px 22px 0;border-top:1px solid var(--card-border)}
+    .logout-btn{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--danger);padding:10px 0;background:none;border:none;font-family:'Outfit',sans-serif;cursor:pointer;text-decoration:none;transition:opacity .2s}
+    .logout-btn:hover{opacity:.7}
+
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);flex:1;padding:28px 32px 60px;min-width:0}
+
+    /* TOPBAR */
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px}
+    .topbar h1{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--text-dark)}
+    .topbar h1 em{font-style:italic;color:var(--accent)}
+    .topbar-sub{font-size:.82rem;color:var(--text-soft);margin-top:3px}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+    .avatar-admin{width:38px;height:38px;background:linear-gradient(135deg,var(--danger),#c05050);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:.85rem}
+
+    /* SECTION HEADING */
+    .section-heading{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:400;color:var(--text-dark);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+    .section-heading::after{content:'';flex:1;height:1px;background:var(--card-border);margin-left:8px}
+
+    /* STAT CARDS */
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:30px}
+    .stat-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px;backdrop-filter:blur(12px);transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden}
+    .stat-card::before{content:'';position:absolute;top:-24px;right:-24px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,var(--sky-mid) 0%,transparent 70%);opacity:.6}
+    .stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(42,143,168,.12)}
+    .stat-card-icon{font-size:1.3rem;margin-bottom:8px}
+    .stat-card-label{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);margin-bottom:6px}
+    .stat-card-value{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--text-dark);line-height:1}
+    .stat-card-sub{font-size:.73rem;color:var(--text-soft);margin-top:4px}
+
+    /* CARD */
+    .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:18px;backdrop-filter:blur(14px);overflow:hidden;margin-bottom:24px}
+    .card-header{padding:18px 22px 14px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--text-dark);display:flex;align-items:center;gap:8px}
+    .card-body{padding:0}
+
+    /* TABLE */
+    table{width:100%;border-collapse:collapse;font-size:.83rem}
+    thead th{font-size:.68rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-soft);padding:10px 16px;text-align:left;border-bottom:1px solid var(--card-border)}
+    tbody tr{border-bottom:1px solid rgba(168,216,234,.18);transition:background .15s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:rgba(168,216,234,.1)}
+    tbody td{padding:11px 16px;color:var(--text-mid);vertical-align:middle}
+    tbody td:first-child{color:var(--text-dark);font-weight:500}
+
+    /* BADGES */
+    .badge{display:inline-block;padding:3px 9px;border-radius:50px;font-size:.68rem;font-weight:500;letter-spacing:.04em}
+    .badge-read    {background:rgba(91,171,138,.12);color:var(--success);border:1px solid rgba(91,171,138,.3)}
+    .badge-unread  {background:rgba(224,112,112,.1);color:var(--danger);border:1px solid rgba(224,112,112,.25)}
+    .badge-general {background:rgba(42,143,168,.1);color:var(--accent);border:1px solid rgba(42,143,168,.25)}
+    .badge-icu     {background:rgba(224,112,112,.1);color:var(--danger);border:1px solid rgba(224,112,112,.25)}
+    .badge-maternity{background:rgba(212,149,106,.1);color:var(--warn);border:1px solid rgba(212,149,106,.3)}
+    .badge-pediatric{background:rgba(91,171,138,.12);color:var(--success);border:1px solid rgba(91,171,138,.3)}
+    .badge-pending {background:rgba(212,149,106,.1);color:var(--warn);border:1px solid rgba(212,149,106,.3)}
+    .badge-active  {background:rgba(91,171,138,.12);color:var(--success);border:1px solid rgba(91,171,138,.3)}
+
+    /* FORM ELEMENTS */
+    .form-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    input[type=text],input[type=date],textarea,select{font-family:'Outfit',sans-serif;font-size:.83rem;color:var(--text-dark);background:rgba(248,252,255,.9);border:1.5px solid rgba(168,216,234,.6);border-radius:10px;padding:8px 12px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+    input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(42,143,168,.1)}
+    textarea{resize:vertical;min-height:80px;line-height:1.5}
+    .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+    .form-label{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.05em;cursor:pointer;border:none;transition:transform .2s,box-shadow .2s;text-decoration:none}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--accent);color:white;box-shadow:0 5px 18px rgba(42,143,168,.28)}
+    .btn-primary:hover{box-shadow:0 10px 28px rgba(42,143,168,.38)}
+    .btn-danger{background:var(--danger);color:white;box-shadow:0 5px 18px rgba(224,112,112,.25)}
+    .btn-danger:hover{box-shadow:0 10px 28px rgba(224,112,112,.35)}
+    .btn-ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+    .btn-ghost:hover{background:var(--accent-light)}
+    .btn-sm{padding:5px 12px;font-size:.72rem}
+
+    /* REPLY FORM (inline in message table) */
+    .reply-form{padding:14px 16px;background:var(--accent-light);border-top:1px solid var(--card-border)}
+    .reply-form textarea{min-height:60px;margin-bottom:8px}
+
+    /* MODAL OVERLAY */
+    .modal-overlay{position:fixed;inset:0;background:rgba(26,58,74,.35);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--card-bg);border:1px solid var(--card-border);border-radius:22px;backdrop-filter:blur(20px);padding:32px;width:100%;max-width:520px;box-shadow:0 24px 80px rgba(42,143,168,.18)}
+    .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--text-dark);margin-bottom:20px}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+    /* PANEL SECTIONS (tab content) */
+    .panel-section{display:none}
+    .panel-section.active{display:block}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:32px 20px;color:var(--text-soft);font-size:.83rem}
+    .empty-state-icon{font-size:1.8rem;margin-bottom:8px;opacity:.4}
+
+    /* ACTION COL */
+    .action-col{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+    /* HAMBURGER */
+    .hamburger{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:7px 10px;cursor:pointer;backdrop-filter:blur(10px);font-size:1.1rem}
+    @media(max-width:860px){.hamburger{display:flex}.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0;padding:18px 14px 60px}.form-row{grid-template-columns:1fr}}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--sky-deep);border-radius:4px}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeUp .45s ease both}
+  </style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="blob blob-1"></div><div class="blob blob-2"></div>
+<button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">✦ <span>Medi</span>Care <span class="admin-badge">Admin</span></div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a class="nav-item active" onclick="showPanel('overview',this)"><span class="nav-icon">⊞</span> Dashboard</a>
+
+      <p class="sidebar-section-label">Manage</p>
+      <a class="nav-item" onclick="showPanel('patients',this)"><span class="nav-icon">👥</span> Patients</a>
+      <a class="nav-item" onclick="showPanel('messages',this)">
+        <span class="nav-icon">✉️</span> Messages
+        {# Django: <span class="nav-count danger">{{ unread_count }}</span> #}
+      </a>
+      <a class="nav-item" onclick="showPanel('ward',this)"><span class="nav-icon">🏥</span> Ward</a>
+      <a class="nav-item" onclick="showPanel('medlab',this)"><span class="nav-icon">🔬</span> Lab Records</a>
+      <a class="nav-item" onclick="showPanel('prescriptions',this)"><span class="nav-icon">💊</span> Prescriptions</a>
+    </nav>
+    <div class="sidebar-footer">
+      <p style="font-size:.74rem;color:var(--text-soft);margin-bottom:4px;">Signed in as</p>
+      <p style="font-size:.82rem;font-weight:500;color:var(--text-dark);margin-bottom:12px;">
+        {# Django: {{ request.user.get_full_name|default:request.user.username }} #}
+        Administrator
+      </p>
+      <a href="{% url 'admin:logout' %}" class="logout-btn">↩ Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── OVERVIEW ── -->
+    <div class="panel-section active fade-in" id="panel-overview">
+      <div class="topbar">
+        <div>
+          <h1>Admin <em>Overview</em></h1>
+          <p class="topbar-sub">MediCare control centre — manage all patient data from here</p>
+        </div>
+        <div class="topbar-right">
+          <div class="avatar-admin">A</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-icon">👥</div>
+          <div class="stat-card-label">Total Patients</div>
+          <div class="stat-card-value">{{ patients|length }}</div>
+          <div class="stat-card-sub">Registered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">✉️</div>
+          <div class="stat-card-label">Unread Messages</div>
+          <div class="stat-card-value" style="color:var(--danger)">{{ unread_count }}</div>
+          <div class="stat-card-sub">Awaiting reply</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🏥</div>
+          <div class="stat-card-label">Ward Patients</div>
+          <div class="stat-card-value">{{ ward_count }}</div>
+          <div class="stat-card-sub">Currently admitted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">🔬</div>
+          <div class="stat-card-label">Pending Results</div>
+          <div class="stat-card-value" style="color:var(--warn)">{{ pending_lab_count }}</div>
+          <div class="stat-card-sub">Awaiting upload</div>
+        </div>
+      </div>
+
+      <!-- Recent messages snapshot -->
+      <h2 class="section-heading">✉️ Recent Unread Messages</h2>
+      <div class="card">
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Patient</th><th>Subject</th><th>Category</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+              {% for msg in recent_messages %}
+                <tr>
+                  <td>{{ msg.patient.first_name }} {{ msg.patient.last_name }}</td>
+                  <td>{{ msg.subject }}</td>
+                  <td>{{ msg.category }}</td>
+                  <td>{{ msg.created_at|date:"N j, Y" }}</td>
+                  <td><a class="btn btn-primary btn-sm" href="{% url 'admin_reply_message' msg.id %}">Reply</a></td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">✉️</div>No unread messages.</div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PATIENTS ── -->
+    <div class="panel-section fade-in" id="panel-patients">
+      <div class="topbar">
+        <div><h1>Patient <em>Records</em></h1><p class="topbar-sub">All registered patients</p></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👥 All Patients</span>
+          <form method="GET" style="display:flex;gap:8px;align-items:center">
+            <input type="text" name="q" placeholder="Search by name or ID…" value="{{ request.GET.q }}" style="width:220px"/>
+            <button type="submit" class="btn btn-ghost btn-sm">Search</button>
+          </form>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Patient ID</th><th>Name</th><th>Email</th><th>Age</th><th>Phone</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for p in patients %}
+                <tr>
+                  <td>{{ p.user_id }}</td>
+                  <td>{{ p.first_name }} {{ p.last_name }}</td>
+                  <td>{{ p.email }}</td>
+                  <td>{{ p.age }}</td>
+                  <td>{{ p.phone_number }}</td>
+                  <td><span class="badge badge-active">Active</span></td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">👥</div>No patients found.</div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MESSAGES ── -->
+    <div class="panel-section fade-in" id="panel-messages">
+      <div class="topbar">
+        <div><h1>Patient <em>Messages</em></h1><p class="topbar-sub">Read and reply to patient messages</p></div>
+      </div>
+      {% for msg in all_messages %}
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              💬 {{ msg.subject }}
+              {% if msg.is_read %}<span class="badge badge-read" style="font-size:.65rem">Read</span>
+              {% else %}<span class="badge badge-unread" style="font-size:.65rem">Unread</span>{% endif %}
+            </span>
+            <span style="font-size:.78rem;color:var(--text-soft)">{{ msg.patient.first_name }} {{ msg.patient.last_name }} · {{ msg.created_at|date:"N j, Y" }}</span>
+          </div>
+          <div class="card-body" style="padding:16px 22px">
+            <p style="font-size:.85rem;color:var(--text-mid);line-height:1.65;margin-bottom:14px">{{ msg.message }}</p>
+
+            {% if msg.reply %}
+              <div style="padding:10px 14px;background:var(--accent-light);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;font-size:.82rem;color:var(--text-mid)">
+                <strong style="display:block;font-size:.7rem;color:var(--accent);letter-spacing:.06em;margin-bottom:4px">YOUR REPLY:</strong>
+                {{ msg.reply }}
+              </div>
+            {% else %}
+              <!-- Reply form -->
+              <form method="POST" action="{% url 'admin_reply_message' msg.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label class="form-label">Write a reply</label>
+                  <textarea name="reply" placeholder="Type your reply to {{ msg.patient.first_name }}…"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Send Reply</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <div class="card"><div class="empty-state"><div class="empty-state-icon">✉️</div>No messages from patients yet.</div></div>
+      {% endfor %}
+    </div>
+
+    <!-- ── WARD ── -->
+    <div class="panel-section fade-in" id="panel-ward">
+      <div class="topbar">
+        <div><h1>Ward <em>Management</em></h1><p class="topbar-sub">Assign patients to wards and control visibility</p></div>
+        <button class="btn btn-primary" onclick="document.getElementById('modal-ward').classList.add('open')">+ Assign Ward</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">🏥 Current Ward Assignments</span></div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Patient</th><th>ID</th><th>Ward</th><th>Bed</th><th>Category</th><th>Guardian</th><th>Visible</th><th>Actions</th></tr></thead>
+            <tbody>
+              {% for ward in all_wards %}
+                <tr>
+                  <td>{{ ward.patient_name }}</td>
+                  <td>{{ ward.patient_id }}</td>
+                  <td>{{ ward.ward_number }}</td>
+                  <td>{{ ward.bed_number }}</td>
+                  <td><span class="badge badge-{{ ward.ward_category|lower }}">{{ ward.get_ward_category_display }}</span></td>
+                  <td>{{ ward.guardians_name }}</td>
+                  <td>
+                    {% if ward.is_visible_to_user %}
+                      <span class="badge badge-active">Visible</span>
+                    {% else %}
+                      <span class="badge badge-pending">Hidden</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="action-col">
+                      <a href="{% url 'admin_toggle_ward' ward.id %}" class="btn btn-ghost btn-sm">
+                        {% if ward.is_visible_to_user %}Hide{% else %}Show{% endif %}
+                      </a>
+                      <a href="{% url 'admin_edit_ward' ward.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🏥</div>No ward records yet.</div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MED LAB ── -->
+    <div class="panel-section fade-in" id="panel-medlab">
+      <div class="topbar">
+        <div><h1>Lab <em>Records</em></h1><p class="topbar-sub">Upload results and control patient visibility</p></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">🔬 All Lab Requests</span></div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Patient</th><th>ID</th><th>Test</th><th>Date</th><th>Result</th><th>Visible</th><th>Actions</th></tr></thead>
+            <tbody>
+              {% for lab in all_labs %}
+                <tr>
+                  <td>{{ lab.PAT_name }}</td>
+                  <td>{{ lab.PAT_ID }}</td>
+                  <td>{{ lab.get_lab_service_display }}</td>
+                  <td>{{ lab.report_date|date:"N j, Y"|default:"—" }}</td>
+                  <td>
+                    {% if lab.has_result %}
+                      <span class="badge badge-active">Uploaded</span>
+                    {% else %}
+                      <span class="badge badge-pending">Pending</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if lab.visible_to_patient %}
+                      <span class="badge badge-active">Visible</span>
+                    {% else %}
+                      <span class="badge badge-pending">Hidden</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="action-col">
+                      <a href="{% url 'admin_upload_lab' lab.id %}" class="btn btn-primary btn-sm">Upload</a>
+                      <a href="{% url 'admin_toggle_lab' lab.id %}" class="btn btn-ghost btn-sm">
+                        {% if lab.visible_to_patient %}Hide{% else %}Show{% endif %}
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">🔬</div>No lab records yet.</div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRESCRIPTIONS ── -->
+    <div class="panel-section fade-in" id="panel-prescriptions">
+      <div class="topbar">
+        <div><h1>Prescription <em>Management</em></h1><p class="topbar-sub">Add and manage patient prescriptions</p></div>
+        <button class="btn btn-primary" onclick="document.getElementById('modal-rx').classList.add('open')">+ Add Prescription</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">💊 All Prescriptions</span></div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Drug Name</th><th>Dosage</th><th>Actions</th></tr></thead>
+            <tbody>
+              {% for rx in all_prescriptions %}
+                <tr>
+                  <td>{{ rx.drug_name }}</td>
+                  <td>{{ rx.dosage }}</td>
+                  <td>
+                    <div class="action-col">
+                      <a href="{% url 'admin_edit_prescription' rx.id %}" class="btn btn-ghost btn-sm">Edit</a>
+                      <a href="{% url 'admin_delete_prescription' rx.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this prescription?')">Delete</a>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="3"><div class="empty-state"><div class="empty-state-icon">💊</div>No prescriptions yet.</div></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── WARD MODAL ── -->
+<div class="modal-overlay" id="modal-ward">
+  <div class="modal">
+    <h2 class="modal-title">🏥 Assign Ward to Patient</h2>
+    <form method="POST" action="{% url 'admin_create_ward' %}">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Patient Name</label><input type="text" name="patient_name" required/></div>
+        <div class="form-group"><label class="form-label">Patient ID</label><input type="text" name="patient_id" placeholder="PAT-xxxxxxxx" required/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Ward Number</label><input type="text" name="ward_number" required/></div>
+        <div class="form-group"><label class="form-label">Bed Number</label><input type="text" name="bed_number" required/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ward Category</label>
+          <select name="ward_category">
+            <option value="General">General</option>
+            <option value="ICU">ICU</option>
+            <option value="Maternity">Maternity</option>
+            <option value="Pediatric">Pediatric</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Contact Number</label><input type="text" name="contact_number"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Guardian's Name</label><input type="text" name="guardians_name"/></div>
+      <div class="form-group"><label class="form-label">Medical Report</label><textarea name="report" placeholder="Optional initial report…"></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('modal-ward').classList.remove('open')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Assign Ward</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── PRESCRIPTION MODAL ── -->
+<div class="modal-overlay" id="modal-rx">
+  <div class="modal">
+    <h2 class="modal-title">💊 Add Prescription</h2>
+    <form method="POST" action="{% url 'admin_create_prescription' %}">
+      {% csrf_token %}
+      <div class="form-group"><label class="form-label">Drug Name</label><input type="text" name="drug_name" required/></div>
+      <div class="form-group"><label class="form-label">Dosage Instructions</label><textarea name="dosage" placeholder="e.g. 1 tablet daily — morning" required></textarea></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('modal-rx').classList.remove('open')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Prescription</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function showPanel(name, el) {
+    document.querySelectorAll('.panel-section').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    el.classList.add('active');
+    document.querySelector('.sidebar').classList.remove('open');
+  }
+
+  // Close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+  });
+</script>
+</body>
+>>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
 </html>
