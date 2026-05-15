@@ -1,410 +1,418 @@
-<<<<<<< HEAD
-<!-- templates/medlab_records.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Lab Results</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCare — Lab Services</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --sky-deep:#a8d8ea;--sky-mid:#cceeff;--sky-pale:#f3fbff;
+      --text-dark:#1a3a4a;--text-mid:#3a6070;--text-soft:#6899aa;
+      --accent:#2a8fa8;--accent-light:rgba(42,143,168,.08);--accent-glow:rgba(42,143,168,.18);
+      --card-bg:rgba(255,255,255,.72);--card-border:rgba(168,216,234,.55);
+      --danger:#e07070;--success:#5bab8a;--warn:#d4956a;
+      --sidebar-w:260px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Outfit',sans-serif;color:var(--text-dark);background:var(--sky-pale);overflow-x:hidden;min-height:100vh;}
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f0f4f8;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
+    .bg-canvas{position:fixed;inset:0;z-index:-1;background:linear-gradient(160deg,#ddf2fb 0%,#b8e4f4 20%,#cceeff 40%,#e8f7ff 60%,#f0faff 80%,#fff 100%);background-size:300% 300%;animation:gradientShift 14s ease infinite;}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.28;pointer-events:none;z-index:-1;animation:floatBlob 18s ease-in-out infinite;}
+    .blob-1{width:500px;height:500px;background:#8fd0e8;top:-100px;left:-80px;}
+    .blob-2{width:340px;height:340px;background:#b0e0f5;top:45%;right:-60px;animation-delay:-7s;}
+    .blob-3{width:280px;height:280px;background:#cceeff;bottom:0;left:35%;animation-delay:-13s;}
+    @keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(28px,-36px) scale(1.04)}66%{transform:translate(-18px,18px) scale(.97)}}
 
-        .container { max-width: 800px; margin: 0 auto; }
+    .layout{display:flex;min-height:100vh;}
 
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 8px;
-        }
+    /* SIDEBAR */
+    .sidebar{width:var(--sidebar-w);position:fixed;top:0;left:0;bottom:0;background:rgba(255,255,255,.62);backdrop-filter:blur(22px);border-right:1px solid var(--card-border);display:flex;flex-direction:column;padding:28px 0 24px;z-index:50;transition:transform .3s;}
+    .sidebar-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--accent);padding:0 28px 28px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;gap:8px;}
+    .sidebar-logo span{color:var(--text-dark);}
+    .sidebar-section-label{font-size:.68rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--text-soft);padding:22px 28px 8px;}
+    .sidebar-nav{flex:1;padding:8px 0;overflow-y:auto;}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 28px;font-size:.88rem;font-weight:400;color:var(--text-mid);border-left:3px solid transparent;transition:background .2s,color .2s,border-color .2s;text-decoration:none;}
+    .nav-item:hover{background:var(--accent-light);color:var(--accent);}
+    .nav-item.active{background:var(--accent-light);color:var(--accent);border-left-color:var(--accent);font-weight:500;}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;}
+    .sidebar-footer{padding:16px 28px 0;border-top:1px solid var(--card-border);}
+    .logout-btn{display:flex;align-items:center;gap:10px;font-size:.84rem;color:var(--danger);cursor:pointer;padding:10px 0;background:none;border:none;font-family:'Outfit',sans-serif;transition:opacity .2s;text-decoration:none;}
+    .logout-btn:hover{opacity:.7;}
 
-        .subtitle {
-            color: #718096;
-            font-size: 14px;
-            margin-bottom: 28px;
-        }
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);flex:1;padding:40px 40px 60px;min-width:0;}
 
-        /* ── Filters ── */
-        .filters {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
+    /* PAGE HEADER */
+    .page-header{margin-bottom:34px;}
+    .page-eyebrow{font-size:.75rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:400;color:var(--text-dark);line-height:1.1;}
+    .page-title em{font-style:italic;color:var(--accent);}
+    .page-subtitle{font-size:.88rem;color:var(--text-soft);margin-top:6px;line-height:1.6;}
 
-        .filters select {
-            padding: 8px 12px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 13px;
-            background: white;
-            color: #2d3748;
-            cursor: pointer;
-            outline: none;
-        }
+    /* SECTION HEADING */
+    .section-heading{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--text-dark);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+    .section-heading::after{content:'';flex:1;height:1px;background:var(--card-border);margin-left:8px;}
 
-        .filters select:focus { border-color: #3182ce; }
+    /* REQUEST CARD */
+    .request-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:24px;padding:36px 40px;backdrop-filter:blur(14px);box-shadow:0 12px 50px rgba(42,143,168,.09);margin-bottom:40px;}
 
-        .btn-filter {
-            padding: 8px 18px;
-            background: #2b6cb0;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    .service-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:28px;}
 
-        /* ── Cards ── */
-        .record-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-        }
+    .service-tile{
+      background:rgba(248,252,255,.9);
+      border:2px solid rgba(168,216,234,.45);
+      border-radius:16px;padding:20px 16px;
+      text-align:center;cursor:pointer;
+      transition:border-color .2s,background .2s,transform .2s,box-shadow .2s;
+      position:relative;
+    }
+    .service-tile:hover{border-color:var(--accent);background:#fff;transform:translateY(-2px);box-shadow:0 8px 28px rgba(42,143,168,.13);}
+    .service-tile.selected{border-color:var(--accent);background:rgba(42,143,168,.06);box-shadow:0 0 0 3px rgba(42,143,168,.15);}
+    .service-tile input[type="radio"]{position:absolute;opacity:0;width:0;height:0;}
+    .service-tile-icon{font-size:1.8rem;margin-bottom:10px;display:block;}
+    .service-tile-name{font-size:.85rem;font-weight:500;color:var(--text-dark);}
+    .service-tile-desc{font-size:.73rem;color:var(--text-soft);margin-top:4px;line-height:1.4;}
+    .service-tile .selected-check{display:none;position:absolute;top:10px;right:12px;width:20px;height:20px;background:var(--accent);border-radius:50%;color:#fff;font-size:.65rem;align-items:center;justify-content:center;}
+    .service-tile.selected .selected-check{display:flex;}
 
-        .record-info h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a202c;
-        }
+    /* Hidden native select (used for form submission) */
+    #id_lab_service{display:none;}
 
-        .record-info p {
-            font-size: 13px;
-            color: #718096;
-            margin-top: 4px;
-        }
+    .submit-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+    .btn-submit{padding:13px 36px;background:var(--accent);color:#fff;border:none;border-radius:50px;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:500;letter-spacing:.07em;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 8px 28px rgba(42,143,168,.28);}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(42,143,168,.38);}
+    .btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .selection-hint{font-size:.82rem;color:var(--text-soft);font-style:italic;}
 
-        /* ── Status badges ── */
-        .badge {
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
+    /* SUCCESS TOAST */
+    .toast{display:none;align-items:center;gap:12px;background:rgba(91,171,138,.12);border:1px solid rgba(91,171,138,.35);border-radius:14px;padding:14px 18px;margin-bottom:24px;font-size:.88rem;color:#2d7a5a;}
+    .toast.show{display:flex;}
+    .toast-icon{font-size:1.1rem;}
 
-        .badge-pending {
-            background: #fefcbf;
-            color: #b7791f;
-        }
+    /* INFO NOTE */
+    .info-note{display:flex;align-items:flex-start;gap:12px;background:rgba(168,216,234,.15);border:1px solid rgba(168,216,234,.4);border-radius:14px;padding:14px 18px;margin-bottom:28px;font-size:.82rem;color:var(--text-mid);line-height:1.6;}
+    .info-note-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
 
-        .badge-ready {
-            background: #c6f6d5;
-            color: #276749;
-        }
+    /* RESULTS TABLE */
+    .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;backdrop-filter:blur(14px);overflow:hidden;}
+    .card-header{padding:20px 26px 16px;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--text-dark);}
 
-        .btn-download {
-            padding: 8px 16px;
-            background: #276749;
-            color: white;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            white-space: nowrap;
-        }
+    table{width:100%;border-collapse:collapse;font-size:.85rem;}
+    thead th{font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text-soft);padding:12px 20px;text-align:left;border-bottom:1px solid var(--card-border);}
+    tbody tr{border-bottom:1px solid rgba(168,216,234,.2);transition:background .15s;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:rgba(168,216,234,.08);}
+    tbody td{padding:14px 20px;color:var(--text-mid);vertical-align:middle;}
+    tbody td:first-child{color:var(--text-dark);font-weight:500;}
 
-        .btn-download:hover { background: #22543d; }
+    .badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.72rem;font-weight:500;}
+    .badge-pending{background:rgba(212,149,106,.1);color:var(--warn);border:1px solid rgba(212,149,106,.3);}
+    .badge-ready{background:rgba(91,171,138,.12);color:var(--success);border:1px solid rgba(91,171,138,.3);}
 
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: #a0aec0;
-        }
+    .view-result-btn{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;color:var(--accent);background:var(--accent-light);padding:5px 12px;border-radius:50px;border:1px solid rgba(42,143,168,.2);cursor:pointer;font-family:'Outfit',sans-serif;transition:background .2s;}
+    .view-result-btn:hover{background:rgba(42,143,168,.15);}
 
-        .empty span { font-size: 48px; display: block; margin-bottom: 12px; }
+    /* LIGHTBOX */
+    .lightbox{display:none;position:fixed;inset:0;background:rgba(26,58,74,.85);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;}
+    .lightbox.open{display:flex;}
+    .lightbox-inner{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;padding:28px;max-width:700px;width:92%;backdrop-filter:blur(18px);position:relative;}
+    .lightbox-close{position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-soft);}
+    .lightbox-close:hover{color:var(--text-dark);}
+    .lightbox-label{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--text-dark);margin-bottom:16px;}
+    .lightbox-img{width:100%;border-radius:12px;max-height:520px;object-fit:contain;}
 
-        .btn-new {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 24px;
-            background: #2b6cb0;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-        }
-    </style>
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:40px 20px;color:var(--text-soft);font-size:.85rem;}
+    .empty-state-icon{font-size:2.2rem;margin-bottom:10px;opacity:.4;}
+
+    /* SERVICE ICON MAP (inline via data attr) */
+
+    /* ANIMATIONS */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeUp .5s ease both;}
+    .delay-1{animation-delay:.1s;}.delay-2{animation-delay:.2s;}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .sidebar{transform:translateX(-100%);}
+      .sidebar.open{transform:translateX(0);}
+      .main{margin-left:0;padding:24px 18px 60px;}
+      .service-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+    }
+    .hamburger{display:none;position:fixed;top:18px;left:18px;z-index:200;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:8px 10px;cursor:pointer;backdrop-filter:blur(10px);font-size:1.1rem;}
+    @media(max-width:900px){.hamburger{display:flex;}}
+    ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--sky-deep);border-radius:4px;}
+  </style>
 </head>
 <body>
-<div class="container">
 
-    <h1>🧪 My Lab Results</h1>
-    <p class="subtitle">Track the status of your submitted lab tests.</p>
+<div class="bg-canvas"></div>
+<div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+<button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
 
-    <!-- Filters -->
-    <form method="GET">
-        <div class="filters">
-            <select name="service">
-                <option value="">All Services</option>
-                {% for value, label in services %}
-                    <option value="{{ value }}"
-                        {% if selected_service == value %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                {% endfor %}
-            </select>
+<!-- LIGHTBOX -->
+<div class="lightbox" id="labLightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <p class="lightbox-label" id="lightboxLabel">Lab Result</p>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="Lab Result" />
+  </div>
+</div>
 
-            <select name="status">
-                <option value="">All Statuses</option>
-                <option value="ready"   {% if selected_status == 'ready'   %}selected{% endif %}>Ready</option>
-                <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
-            </select>
+<div class="layout">
 
-            <button type="submit" class="btn-filter">Filter</button>
-        </div>
-    </form>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">✦ <span>Medi</span>Care</div>
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Overview</p>
+      <a class="nav-item" href="{% url 'dashboard' %}"><span class="nav-icon">⊞</span> Dashboard</a>
+      <a class="nav-item" href="{% url 'dashboard' %}#profile"><span class="nav-icon">👤</span> My Profile</a>
+      <p class="sidebar-section-label">Health</p>
+      <a class="nav-item" href="{% url 'prescriptions' %}"><span class="nav-icon">💊</span> Prescriptions</a>
+      <a class="nav-item active" href="{% url 'medlab' %}"><span class="nav-icon">🔬</span> Lab Results</a>
+      <a class="nav-item" href="{% url 'ward' %}"><span class="nav-icon">🏥</span> Ward Info</a>
+    </nav>
+    <div class="sidebar-footer">
+      <p style="font-size:.78rem;color:var(--text-soft);margin-bottom:4px;">Logged in as</p>
+      <p style="font-size:.85rem;font-weight:500;color:var(--text-dark);margin-bottom:14px;">{{ patient.first_name }} {{ patient.last_name }}</p>
+      <a href="{% url 'logout' %}" class="logout-btn">↩ Sign Out</a>
+    </div>
+  </aside>
 
-    <!-- Records -->
-    {% if data %}
-        {% for item in data %}
-        <div class="record-card">
-            <div class="record-info">
-                <h3>{{ item.lab_service }}</h3>
-                <p>{{ item.PAT_name }} &nbsp;·&nbsp; ID: {{ item.PAT_ID }}</p>
-            </div>
+  <!-- MAIN -->
+  <main class="main">
 
-            <div style="display:flex; align-items:center; gap:12px;">
-                {% if item.result_url %}
-                    <span class="badge badge-ready">Ready ✓</span>
-                    <a href="{{ item.result_url }}" class="btn-download" target="_blank">
-                        Download
-                    </a>
-                {% else %}
-                    <span class="badge badge-pending">Pending...</span>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
+    <div class="page-header fade-in">
+      <p class="page-eyebrow">Medical Laboratory</p>
+      <h1 class="page-title">Lab <em>Services</em></h1>
+      <p class="page-subtitle">Request a test below. Your results will appear in this page once our team has processed them.</p>
+    </div>
 
-    {% else %}
-        <div class="empty">
-            <span>🔬</span>
-            <p>No lab records found.</p>
-            <a href="{% url 'medlab_submit' %}" class="btn-new">+ Submit a Request</a>
-        </div>
+    <!-- SUCCESS TOAST (shown after POST redirect if needed) -->
+    {% if request.GET.submitted %}
+    <div class="toast show fade-in">
+      <span class="toast-icon">✅</span>
+      <span>Your lab request has been submitted. Our team will process it and upload your result shortly.</span>
+    </div>
     {% endif %}
 
-</div>
-</body>
-=======
-<!-- templates/medlab_records.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Lab Results</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+    <!-- REQUEST SECTION -->
+    <h2 class="section-heading fade-in">🔬 Request a Test</h2>
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f0f4f8;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
+    <div class="request-card fade-in delay-1">
 
-        .container { max-width: 800px; margin: 0 auto; }
+      <div class="info-note">
+        <span class="info-note-icon">ℹ️</span>
+        <span>Select the test you need from the options below and click <strong>Submit Request</strong>. The hospital team will be notified and will upload your result when ready.</span>
+      </div>
 
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 8px;
-        }
+      <form method="POST" id="labForm">
+        {% csrf_token %}
 
-        .subtitle {
-            color: #718096;
-            font-size: 14px;
-            margin-bottom: 28px;
-        }
+        <!-- Visual tile grid — drives the hidden select -->
+        <div class="service-grid" id="serviceGrid">
 
-        /* ── Filters ── */
-        .filters {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
+          <label class="service-tile" data-value="Blood Test">
+            <input type="radio" name="lab_service_visual" value="Blood Test" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">🩸</span>
+            <span class="service-tile-name">Blood Test</span>
+            <span class="service-tile-desc">Full blood count & panel</span>
+          </label>
 
-        .filters select {
-            padding: 8px 12px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 13px;
-            background: white;
-            color: #2d3748;
-            cursor: pointer;
-            outline: none;
-        }
+          <label class="service-tile" data-value="X-ray">
+            <input type="radio" name="lab_service_visual" value="X-ray" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">🦴</span>
+            <span class="service-tile-name">X-ray</span>
+            <span class="service-tile-desc">Bone & chest imaging</span>
+          </label>
 
-        .filters select:focus { border-color: #3182ce; }
+          <label class="service-tile" data-value="MRI">
+            <input type="radio" name="lab_service_visual" value="MRI" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">🧲</span>
+            <span class="service-tile-name">MRI</span>
+            <span class="service-tile-desc">Magnetic resonance imaging</span>
+          </label>
 
-        .btn-filter {
-            padding: 8px 18px;
-            background: #2b6cb0;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+          <label class="service-tile" data-value="CT Scan">
+            <input type="radio" name="lab_service_visual" value="CT Scan" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">🖥️</span>
+            <span class="service-tile-name">CT Scan</span>
+            <span class="service-tile-desc">Computed tomography</span>
+          </label>
 
-        /* ── Cards ── */
-        .record-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-        }
+          <label class="service-tile" data-value="Ultrasound">
+            <input type="radio" name="lab_service_visual" value="Ultrasound" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">🔊</span>
+            <span class="service-tile-name">Ultrasound</span>
+            <span class="service-tile-desc">Soft tissue scan</span>
+          </label>
 
-        .record-info h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a202c;
-        }
+          <label class="service-tile" data-value="ECG">
+            <input type="radio" name="lab_service_visual" value="ECG" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">💓</span>
+            <span class="service-tile-name">ECG</span>
+            <span class="service-tile-desc">Heart rhythm monitoring</span>
+          </label>
 
-        .record-info p {
-            font-size: 13px;
-            color: #718096;
-            margin-top: 4px;
-        }
+          <label class="service-tile" data-value="Urine Test">
+            <input type="radio" name="lab_service_visual" value="Urine Test" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">🧪</span>
+            <span class="service-tile-name">Urine Test</span>
+            <span class="service-tile-desc">Urinalysis & culture</span>
+          </label>
 
-        /* ── Status badges ── */
-        .badge {
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
+          <label class="service-tile" data-value="Biopsy">
+            <input type="radio" name="lab_service_visual" value="Biopsy" />
+            <span class="selected-check">✓</span>
+            <span class="service-tile-icon">🔬</span>
+            <span class="service-tile-name">Biopsy</span>
+            <span class="service-tile-desc">Tissue sample analysis</span>
+          </label>
 
-        .badge-pending {
-            background: #fefcbf;
-            color: #b7791f;
-        }
-
-        .badge-ready {
-            background: #c6f6d5;
-            color: #276749;
-        }
-
-        .btn-download {
-            padding: 8px 16px;
-            background: #276749;
-            color: white;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-
-        .btn-download:hover { background: #22543d; }
-
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: #a0aec0;
-        }
-
-        .empty span { font-size: 48px; display: block; margin-bottom: 12px; }
-
-        .btn-new {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 24px;
-            background: #2b6cb0;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-
-    <h1>🧪 My Lab Results</h1>
-    <p class="subtitle">Track the status of your submitted lab tests.</p>
-
-    <!-- Filters -->
-    <form method="GET">
-        <div class="filters">
-            <select name="service">
-                <option value="">All Services</option>
-                {% for value, label in services %}
-                    <option value="{{ value }}"
-                        {% if selected_service == value %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                {% endfor %}
-            </select>
-
-            <select name="status">
-                <option value="">All Statuses</option>
-                <option value="ready"   {% if selected_status == 'ready'   %}selected{% endif %}>Ready</option>
-                <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
-            </select>
-
-            <button type="submit" class="btn-filter">Filter</button>
         </div>
-    </form>
 
-    <!-- Records -->
-    {% if data %}
-        {% for item in data %}
-        <div class="record-card">
-            <div class="record-info">
-                <h3>{{ item.lab_service }}</h3>
-                <p>{{ item.PAT_name }} &nbsp;·&nbsp; ID: {{ item.PAT_ID }}</p>
-            </div>
+        <!-- Hidden real select that Django form reads -->
+        {{ form.lab_service }}
 
-            <div style="display:flex; align-items:center; gap:12px;">
-                {% if item.result_url %}
-                    <span class="badge badge-ready">Ready ✓</span>
-                    <a href="{{ item.result_url }}" class="btn-download" target="_blank">
-                        Download
-                    </a>
+        <div class="submit-row">
+          <button type="submit" class="btn-submit" id="submitBtn" disabled>
+            Submit Request →
+          </button>
+          <span class="selection-hint" id="selectionHint">Select a test to continue</span>
+        </div>
+      </form>
+    </div>
+
+    <!-- RESULTS SECTION -->
+    <h2 class="section-heading fade-in delay-2">📋 My Lab Records</h2>
+    <div class="card fade-in delay-2">
+      <div class="card-header">
+        <span class="card-title">Test History & Results</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Date Requested / Reported</th>
+            <th>Status</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lab in lab_records %}
+            <tr>
+              <td>{{ lab.get_lab_service_display }}</td>
+              <td>{% if lab.report_date %}{{ lab.report_date|date:"j M Y" }}{% else %}Awaiting report{% endif %}</td>
+              <td>
+                {% if lab.has_result %}
+                  <span class="badge badge-ready">✓ Ready</span>
                 {% else %}
-                    <span class="badge badge-pending">Pending...</span>
+                  <span class="badge badge-pending">⏳ Pending</span>
                 {% endif %}
-            </div>
-        </div>
-        {% endfor %}
+              </td>
+              <td>
+                {% if lab.has_result %}
+                  <button
+                    class="view-result-btn"
+                    onclick="openLightbox('{{ lab.test_results.url }}', '{{ lab.get_lab_service_display }}')"
+                  >🖼 View Result</button>
+                {% else %}
+                  <span style="font-size:.8rem;color:var(--text-soft);">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <div class="empty-state-icon">🔬</div>
+                  <p>No lab records yet. Request your first test above.</p>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-    {% else %}
-        <div class="empty">
-            <span>🔬</span>
-            <p>No lab records found.</p>
-            <a href="{% url 'medlab_submit' %}" class="btn-new">+ Submit a Request</a>
-        </div>
-    {% endif %}
-
+  </main>
 </div>
+
+<script>
+  // ── Tile selection → syncs to hidden Django select ──
+  const tiles      = document.querySelectorAll('.service-tile');
+  const nativeSelect = document.getElementById('id_lab_service');
+  const submitBtn  = document.getElementById('submitBtn');
+  const hint       = document.getElementById('selectionHint');
+
+  tiles.forEach(tile => {
+    tile.addEventListener('click', () => {
+      // Deselect all
+      tiles.forEach(t => t.classList.remove('selected'));
+      // Select clicked
+      tile.classList.add('selected');
+      // Sync to native select
+      const value = tile.dataset.value;
+      nativeSelect.value = value;
+      // Enable submit
+      submitBtn.disabled = false;
+      hint.textContent = `Selected: ${value}`;
+    });
+  });
+
+  // ── Redirect with ?submitted=1 after POST so toast shows ──
+  // (handled server-side via redirect in view — see views.py medlab())
+
+  // ── Sidebar nav ──
+  document.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', function () {
+      document.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelector('.sidebar').classList.remove('open');
+    });
+  });
+
+  // ── Lightbox ──
+  function openLightbox(url, label) {
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('lightboxLabel').textContent = label + ' — Result';
+    document.getElementById('labLightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('labLightbox').classList.remove('open');
+    document.getElementById('lightboxImg').src = '';
+    document.body.style.overflow = '';
+  }
+  document.getElementById('labLightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  // ── Scroll fade-in ──
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity .5s ease, transform .5s ease';
+    io.observe(el);
+  });
+</script>
 </body>
->>>>>>> 96cd80d94f0b2a918a35f13e053a10dfab5481b2
 </html>
